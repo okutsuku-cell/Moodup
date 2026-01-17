@@ -1,0 +1,127 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>For Someone Special — Mood-Up Site</title>
+  <style>
+    :root{--bg:#fff8fb;--card:#ffffff;--accent:#ff6b9a;--muted:#6b6b6b}
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
+    body{background:linear-gradient(180deg,#fff 0%, #fff8fb 100%);display:flex;align-items:center;justify-content:center;padding:20px}
+    .app{width:100%;max-width:460px;background:var(--card);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,0.08);overflow:hidden;position:relative}
+    .screen{height:70vh;min-height:420px;padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:18px;transition:opacity .45s ease, transform .45s ease}
+    .hidden{opacity:0;pointer-events:none;transform:translateY(18px)}.gif{width:220px;height:220px;border-radius:14px;object-fit:cover;box-shadow:0 8px 20px rgba(0,0,0,0.07)}
+h1{margin:0;font-size:1.4rem;color:#222;position:relative}
+p{margin:0;color:var(--muted);font-size:1rem;line-height:1.4}
+
+.heart{position:absolute;font-size:1.2rem;color:#ff6b9a;animation:float 2s infinite ease-in-out}
+@keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-12px)}100%{transform:translateY(0)}}
+
+.controls{display:flex;gap:10px;padding:16px;background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,1));align-items:center;justify-content:space-between}
+.btn{background:var(--accent);color:white;padding:10px 14px;border-radius:12px;border:0;font-weight:600;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(255,107,154,0.18)}
+.dots{display:flex;gap:6px}
+.dot{width:10px;height:10px;border-radius:50%;background:#eee}
+.dot.active{background:var(--accent)}
+
+.portrait{width:220px;height:220px;border-radius:50%;object-fit:cover;border:6px solid #fff;box-shadow:0 12px 30px rgba(0,0,0,0.12)}
+.small{font-size:0.88rem}
+
+footer{font-size:0.75rem;color:#aaa;padding:10px;text-align:center}
+
+@media (max-width:420px){.gif,.portrait{width:180px;height:180px}}
+
+  </style>
+</head>
+<body>
+  <div class="app" role="main">
+    <div id="screens">
+      <section class="screen" data-index="0">
+        <img class="gif" id="gif0" src="https://media.giphy.com/media/3o6ZsZV7iE2wQK3kUg/giphy.gif" alt="cute heart gif">
+        <h1>I'm always here <span class="heart">❤️</span></h1>
+        <p class="small">No matter what happens, I’m right here for you.</p>
+      </section><section class="screen hidden" data-index="1">
+    <img class="gif" id="gif1" src="https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif" alt="cute panda gif">
+    <h1>I will always love you <span class="heart">💕</span></h1>
+    <p class="small">I promise u will never regret you choosing me.</p>
+  </section>
+
+  <section class="screen hidden" data-index="2">
+    <img class="gif" id="gif2" src="https://media.giphy.com/media/BzyTuYCmvSORqs1ABM/giphy.gif" alt="cute puppy gif">
+    <h1>I know you are sad and crying <span class="heart">💖</span></h1>
+    <p class="small">It’s okay to let it out. I’m here to hold you through it.</p>
+  </section>
+
+  <section class="screen hidden" data-index="3">
+    <img id="finalPhoto" class="portrait" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&q=60&auto=format&fit=crop" alt="your photo (replace)">
+    <h1>You are the best. I believe in you <span class="heart">❤️</span></h1>
+    <p class="small">You’ve survived the hardest things in life. I know you can pass this too.</p>
+  </section>
+</div>
+
+<div class="controls">
+  <div style="display:flex;gap:8px;align-items:center">
+    <button id="prev" class="btn ghost">Back</button>
+    <button id="next" class="btn">Next</button>
+  </div>
+
+  <div style="display:flex;gap:10px;align-items:center">
+    <div class="dots" id="dots"></div>
+    <label style="display:flex;align-items:center;gap:8px">
+      <input id="fileInput" type="file" accept="image/*" style="display:none">
+      <button id="uploadBtn" class="btn ghost">Upload photo</button>
+    </label>
+  </div>
+</div>
+
+<footer>Made with care. Customize GIFs or text by editing the HTML file.</footer>
+
+  </div>  <script>
+    const screens = Array.from(document.querySelectorAll('.screen'));
+    const dotsWrap = document.getElementById('dots');
+    const nextBtn = document.getElementById('next');
+    const prevBtn = document.getElementById('prev');
+    const fileInput = document.getElementById('fileInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const finalPhoto = document.getElementById('finalPhoto');
+
+    let idx = 0;
+
+    screens.forEach((s,i)=>{
+      const d = document.createElement('div'); d.className='dot'+(i===0? ' active':''); d.dataset.i=i; dotsWrap.appendChild(d);
+    });
+
+    function show(i){
+      screens.forEach((s,si)=>{
+        if(si===i){ s.classList.remove('hidden'); }
+        else{ s.classList.add('hidden'); }
+      });
+      Array.from(dotsWrap.children).forEach((d,di)=>d.classList.toggle('active', di===i));
+      prevBtn.disabled = i===0;
+      nextBtn.textContent = i===screens.length-1 ? 'Finish' : 'Next';
+    }
+
+    nextBtn.addEventListener('click', ()=>{ if(idx < screens.length-1) idx++; show(idx); });
+    prevBtn.addEventListener('click', ()=>{ if(idx>0) idx--; show(idx); });
+
+    dotsWrap.addEventListener('click', e=>{ if(e.target.classList.contains('dot')){ idx = Number(e.target.dataset.i); show(idx);} });
+
+    uploadBtn.addEventListener('click', ()=> fileInput.click());
+    fileInput.addEventListener('change', (ev)=>{
+      const f = ev.target.files[0];
+      if(!f) return;
+      const url = URL.createObjectURL(f);
+      finalPhoto.src = url;
+    });
+
+    document.addEventListener('keydown', e=>{
+      if(e.key==='p' && idx===screens.length-1){
+        const url = prompt('Paste image URL (must be direct link to an image)');
+        if(url) finalPhoto.src = url;
+      }
+    });
+
+    show(0);
+  </script></body>
+</html>
